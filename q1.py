@@ -78,6 +78,36 @@ def plot_imf(bin_edges, imf_edges):
     plt.savefig("q1c_figure.png", dpi=200)
     plt.show()
 
+## (d)
+
+# define function to extract mode of IMF array
+def max_imf(imf_array):
+    index = np.argmax(imf_array)
+    return imf_array[index]
+
+## (e)
+
+# define function to numerically compute average mass
+def avg_mass(bin_edges, imf_edges):
+
+    # extract bin widths from edges
+    bin_widths = np.diff(bin_edges)
+
+    # compute arithmetic mean for each bin
+    bin_centres = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+    imf_centres = 0.5 * (imf_edges[1:] + imf_edges[:-1])
+
+    # normalise IMF to PDF
+    bin_areas = imf_centres * bin_widths
+    integral = np.sum(bin_areas)
+    imf_pdf = bin_areas / integral
+
+    # sum to derive average mass
+    avg_mass = np.sum(bin_centres * imf_pdf)
+
+    return avg_mass
+
+
 ## execute script only when executed directly (not imported)
 if __name__ == "__main__":
 
@@ -86,7 +116,15 @@ if __name__ == "__main__":
 
     # generate log-spaced grid with IMF values
     grid_edges, imf_grid_edges = discrete_imf(m_min=1e-2, m_max=1e2, n_bins=n_bins)
-
     print("Log-spaced grid successfully generated.")
 
+    # generate IMF plot
     plot_imf(grid_edges, imf_grid_edges)
+
+    # compute mode IMF
+    mode = max_imf(imf_grid_edges)
+    print(f"Most Frequent Stellar Mass: {mode:.2f} Msun")
+
+    # compute average mass
+    avg = avg_mass(grid_edges, imf_grid_edges)
+    print(f"Average Stellar Mass: {avg:.2f} Msun")
