@@ -58,7 +58,7 @@ import matplotlib.pyplot as plt
 def plot_imf(bin_edges, imf_edges):
 
     # setup plot
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(8, 6))
 
     # plot values
     plt.loglog(bin_edges, imf_edges, marker="^", markersize=2,
