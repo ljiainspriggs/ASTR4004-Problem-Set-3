@@ -208,6 +208,54 @@ def find_convergent_mass(target_percent_err=1, low_memory_max=False, keep_array=
 
     return n_optimal, final_mass, n_true, true_mass
 
+## (g)
+
+# define function to round any number to 2 sigfig
+def round_sigfig(x, sigfig=2):
+    return round(x, sigfig - 1 - int(np.floor(np.log10(abs(x)))))
+
+# define function to increase mass until converges to 2 sigfig
+def increase_mass(n_bins=5e4):
+
+    # set no. bins param
+    n_bins = int(np.round(n_bins))
+
+    # calculate high-res mass at M_max = 1e10 for convergence comparison
+    bins, imfs = discrete_imf(m_min=1e-2, m_max=1e10, n_bins=n_bins)
+    ref_mass = avg_mass(bins, imfs)
+    target_mass = round_sigfig(ref_mass, 2)
+
+    # iterate through large mass jumps to determine first sigfig of M_max
+    big_jump_array = 10**np.arange(1, 11, 1)
+    lo_lim = None
+    hi_lim = None
+
+    for m_max in big_jump_array:
+        bins, imfs = discrete_imf(m_min=1e-2, m_max=m_max, n_bins=n_bins)
+        mass = avg_mass(bins, imfs)
+
+        # check whether avg mass has converged to 2 sigfig
+        if round_sigfig(mass, 2) == target_mass:
+            lo_lim = m_max // 10
+            hi_lim = m_max
+            break
+
+    # iterate through moderate mass jumps to find second sigfig of M_max
+    mod_jump_array = np.linspace(lo_lim, hi_lim, 101)
+
+    for m_max in mod_jump_array:
+        bins, imfs = discrete_imf(m_min=1e-2, m_max=m_max, n_bins=n_bins)
+        mass = avg_mass(bins, imfs)
+
+        # check whether mean mass has converged to 2 sigfig
+        if round_sigfig(mass, 2) == target_mass:
+            conv_mass = mass
+            final_max = m_max
+            break
+
+    return round_sigfig(conv_mass, 2), final_max
+
+
 
 ## execute script only when executed directly (not imported)
 if __name__ == "__main__":
@@ -264,3 +312,8 @@ if __name__ == "__main__":
     # save plot
     plt.savefig("q1f_figure.png", dpi=200, bbox_inches="tight") # alternative for tight_layout() when using axes
     plt.show()
+
+    # compute lowest convergent M_max
+    conv_mass, m_max = increase_mass()
+    print(f"Average mass converges at {conv_mass:.2f} Msun for mass maximum {m_max:.1e} Msun.")
+
