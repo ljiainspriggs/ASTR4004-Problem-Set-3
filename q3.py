@@ -71,6 +71,7 @@ def mirror_col_dens(data, filename):
 
 ## (d)
 
+# define function to pad data to desired pixel-dimensioned square
 def pad_square(data, target_dim=1278, filename="brick"):
 
     # derive padding values
@@ -88,7 +89,7 @@ def pad_square(data, target_dim=1278, filename="brick"):
     
     # apply zero-padding
     padded_arr = np.pad(data, pad_width=((pad_bottom, pad_top), (pad_left, pad_right)), 
-                         mode='constant', constant_values=0)
+                        mode="constant", constant_values=0)
 
     # plot
     plt.figure(figsize=(8, 8))
