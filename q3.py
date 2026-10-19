@@ -86,7 +86,7 @@ def pad_square(data, target_dim=1278, filename="brick"):
     pad_left = pad_h // 2 
     pad_right = pad_h - pad_left
     
-    # Apply symmetric zero-padding using np.lib.pad
+    # apply zero-padding
     padded_arr = np.pad(data, pad_width=((pad_bottom, pad_top), (pad_left, pad_right)), 
                          mode='constant', constant_values=0)
 
